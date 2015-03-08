@@ -28,3 +28,22 @@ void dodaj_plik (char *plik, char *element)
 
 	return;
 }
+
+
+char *pobierz_nazwe_pliku (char *skad)
+{
+	int i = 0, j = 0;
+	char *nazwa = malloc ( 128 * sizeof(char));
+
+	while ( skad [i]  == '!')
+		i++;
+
+	while ( skad [i] != ';' && skad [i] != '!')
+	{
+		nazwa[j++] = skad[i];
+		skad[i++] = '!';
+	}
+	skad [i] = '!';
+
+	return nazwa;
+}

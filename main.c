@@ -8,10 +8,11 @@ int main (int argc, char *argv[])
 {
 	int n_flag=1, tryb_flag=0;
 	char *zapisz, *generuj;
-	//lista *wczytaj = inicjuj_liste(), *baza = inicjuj_liste();
 	char *wczytaj, *baza;
 	int limit_slow = 50, limit_akapitow = 1, N_gram = 2;
 	int warunki[7] = { 0, 0, 0, 0, 0, 0, 0 };
+
+	char *obecny_plik;
 
 	wczytaj = malloc (1024 * sizeof(char)); wczytaj[0] = '!';
 	baza = malloc (1024 * sizeof(char)); baza[0] = '!';
@@ -21,32 +22,31 @@ int main (int argc, char *argv[])
 		blad_brak_argumentow();
 		return 1;
 		}
-	
+
 //////////////      FLAGI      /////////////// 
+
 	while (n_flag < argc)
 	{
-		if (tryb_flag == 0)
+ 		if (tryb_flag == 0)
 		{	tryb_flag = jaki_tryb_flag (argv[n_flag]);
 		
 			if (tryb_flag == 0)
 				fprintf (stderr, "Podano argument bez flagi, pominięto %s \n", argv[n_flag] );
 				
 			else if (warunki [tryb_flag-1] > 0)
-				{
-				
-				if (warunki [tryb_flag-1] == 1)
-					blad_warunkow_flag (tryb_flag);
-				warunki [tryb_flag-1]++;
+			{
+
+				blad_warunkow_flag (tryb_flag);
 				tryb_flag = 0;
 
 				n_flag++;
 				if ( n_flag != argc )
 					while (jaki_tryb_flag (argv[n_flag]) == 0)
-						{
+					{
 						n_flag++;
 						if ( n_flag == argc ) break;
-						}
-				}
+					}
+			}
 		}
 		else if (jaki_tryb_flag (argv[n_flag]) == 0)
 		{
@@ -141,20 +141,33 @@ int main (int argc, char *argv[])
 	}
 
 //////////////      SPRAWDZENIE OBECNOŚCI NIEZBĘDNYCH DANYCH      ////////////////
-
-	if ( warunki[0] == 0 && warunki[6] == 0)
+	
+	if ( (warunki[0] == 0) && (warunki[6] == 0))
 	{
 		fprintf( stderr, "Program otrzymał za mało danych - nie ma z czego wygenerować tekstu\n");
 		return 1;
 	}
 
 //////////////      GENEROWANIE BAZY      ////////////////
-
+	
 	while ( warunki[0] != 0 )
 	{
+		obecny_plik = pobierz_nazwe_pliku (wczytaj);
+
+		//BAZA
 		warunki[0]--;
 	}
 
+	while (warunki[6] != 0 )
+	{
+		obecny_plik = pobierz_nazwe_pliku (baza);
+		
+		//BAZA
+		warunki[6]--;
+	}
 
+
+	free(wczytaj);
+	free(baza);
 	return 0;
 }
