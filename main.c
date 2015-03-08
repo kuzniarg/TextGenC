@@ -2,59 +2,23 @@
 #include <stdlib.h>
 #include <string.h>
 #include "pliki.h"
-
-int jaki_tryb_flag (char *tekst)
-{
-	if (strcmp (tekst, "-r") == 0)
-		return 1;
-	else if (strcmp (tekst, "-w") == 0)
-		return 2;
-	else if (strcmp (tekst, "-p") == 0)
-		return 3;
-	else if (strcmp (tekst, "-n") == 0)
-		return 4;
-	else if (strcmp (tekst, "-s") == 0)
-		return 5;
-	else return 0;
-}
-
-void blad_warunkow_flag (int flaga)
-{
-	char nazwa;
-	switch (flaga)
-	{
-		case 1:
-			nazwa = 'r';
-		case 2:
-			nazwa = 'w';
-		case 3:
-			nazwa = 'p';
-		case 4:
-			nazwa = 'n';
-		case 5:
-			nazwa = 's';
-	}
-	fprintf (stderr, "Flaga -%c występuje wielokrotnie (program pobrał dane z najwcześniej podanej)\n", nazwa);
-	return;
-}
-
+#include "flagi.h"
 
 int main (int argc, char *argv[])
 {
 	int n_flag=1, tryb_flag=0;
-	char *wczytaj=NULL, *zapisz=NULL;
-	int limit_slow = 0, limit_akapitow = 0, N_gram = 2;
-	int warunki[5] = { 0, 0, 0, 0, 0 };
+	char *zapisz, *generuj;
+	//lista *wczytaj = inicjuj_liste(), *baza = inicjuj_liste();
+	char *wczytaj, *baza;
+	int limit_slow = 50, limit_akapitow = 1, N_gram = 2;
+	int warunki[7] = { 0, 0, 0, 0, 0, 0, 0 };
 
-	if (argc == 1)
+	wczytaj = malloc (1024 * sizeof(char)); wczytaj[0] = '!';
+	baza = malloc (1024 * sizeof(char)); baza[0] = '!';
+
+	if (argc < 3)
 		{
-		fprintf (stderr, "Brak argumentów\n");
-		return 1;
-		}
-	
-	if (argc == 2)
-		{
-		fprintf (stderr, "Za mało argumentów\n");
+		blad_brak_argumentow();
 		return 1;
 		}
 	
@@ -90,10 +54,10 @@ int main (int argc, char *argv[])
 			{			
 				dodaj_plik (wczytaj, argv[n_flag]);
 				warunki[0]++;
-				
+
 				if ( n_flag + 1 < argc )
-				if ( jaki_tryb_flag ( argv[n_flag+1] ) == 0);
-				tryb_flag = 1;
+					if ( jaki_tryb_flag ( argv[n_flag+1] ) == 0)
+						tryb_flag = 1;
 			}
 			
 			else if (tryb_flag == 2)
@@ -107,46 +71,64 @@ int main (int argc, char *argv[])
 					else 
 					{
 						fprintf (stderr, "Flaga -w otrzymała złą wartość. Argument %s zostanie zignorowany\n", argv[n_flag]);
-						if ( jaki_tryb_flag ( argv[n_flag+1] ) == 0) 
-							tryb_flag = 2;
+						if ( n_flag + 1 < argc )
+							if ( jaki_tryb_flag ( argv[n_flag+1] ) == 0) 
+								tryb_flag = 2;
 					}
 			}
 			else if (tryb_flag == 3)
+			{
+				limit_akapitow = atoi (argv[n_flag]);
+				if (limit_akapitow > 0) 
 				{
-					limit_akapitow = atoi (argv[n_flag]);
-					if (limit_akapitow > 0) 
-					{
-						warunki[2] = 1;
-						tryb_flag = 0;
-					}
-					else
-					{
-						fprintf (stderr, "Flaga -p otrzymała złą wartość. Zostanie ona zignorowana\n");
-						if ( jaki_tryb_flag ( argv[n_flag] ) == 0)
-							tryb_flag = 3;
-					}
-				}
-			else if (tryb_flag == 4)
-				{
-					N_gram = atoi (argv[n_flag]);
-					if (N_gram > 0)
-					{
-						tryb_flag = 0;	
-						warunki[3] = 1;
-					}
-					else
-					{
-						fprintf (stderr, "Flaga -n otrzymała złą wartość. Zostanie ona zignorowana\n");
-						if ( jaki_tryb_flag ( argv[n_flag] ) == 0)
-							tryb_flag = 0;
-					}
-				}
-			else if (tryb_flag == 5)
-				{
-					dodaj_plik (zapisz, argv[n_flag]);
-					warunki[4] = 1;
+					warunki[2] = 1;
 					tryb_flag = 0;
 				}
+				else
+				{
+					fprintf (stderr, "Flaga -p otrzymała złą wartość. Argument %s zostanie zignorowany\n", argv[n_flag]);
+					if ( n_flag + 1 < argc )
+						if ( jaki_tryb_flag ( argv[n_flag+1] ) == 0)
+							tryb_flag = 3;
+				}
+			}
+			else if (tryb_flag == 4)
+			{
+				N_gram = atoi (argv[n_flag]);
+				if (N_gram > 0)
+				{
+					tryb_flag = 0;	
+					warunki[3] = 1;
+				}
+				else
+				{
+					fprintf (stderr, "Flaga -n otrzymała złą wartość. Argument %s zostanie zignorowany\n", argv[n_flag]);
+					if ( n_flag + 1 < argc )
+						if ( jaki_tryb_flag ( argv[n_flag+1] ) == 0)
+							tryb_flag = 4;
+				}
+			}
+			else if (tryb_flag == 5)
+			{
+				zapisz = argv[n_flag];
+				warunki[4] = 1;
+				tryb_flag = 0;
+			}
+			else if (tryb_flag == 6)
+			{
+				generuj = argv[n_flag];
+				warunki[5] = 1;
+				tryb_flag = 0;
+			}
+			else if (tryb_flag == 7)
+			{
+				dodaj_plik (baza, argv[n_flag]);
+				warunki[6]++;
+
+				if ( n_flag + 1 < argc )
+						if ( jaki_tryb_flag ( argv[n_flag+1] ) == 0)
+						tryb_flag = 7;
+			}
 		}	
 		
 		else
@@ -158,7 +140,21 @@ int main (int argc, char *argv[])
 		n_flag++;
 	}
 
+//////////////      SPRAWDZENIE OBECNOŚCI NIEZBĘDNYCH DANYCH      ////////////////
+
+	if ( warunki[0] == 0 && warunki[6] == 0)
+	{
+		fprintf( stderr, "Program otrzymał za mało danych - nie ma z czego wygenerować tekstu\n");
+		return 1;
+	}
 
 //////////////      GENEROWANIE BAZY      ////////////////
+
+	while ( warunki[0] != 0 )
+	{
+		warunki[0]--;
+	}
+
+
 	return 0;
 }

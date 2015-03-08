@@ -1,7 +1,30 @@
 #include "pliki.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-void dodaj_plik (char *nazwa, char *element)
+
+void dodaj_plik (char *plik, char *element)
 {
+	char c = plik[0];
+	int i = 0, j = 0;
+
+	while ( c != '!' )
+	{
+		c = plik[++i];
+	}
+	
+	if ( i != 0)
+		plik[i++] = ';';
+	
+	c = element[j];
+
+	while ( c != '\0' )
+	{
+		plik[i++] = c;
+		c = element[++j];
+	}
+	plik[i] = '!';
+
 	return;
 }
