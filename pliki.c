@@ -30,10 +30,9 @@ void dodaj_plik (char *plik, char *element)
 }
 
 
-char *pobierz_nazwe_pliku (char *skad)
+void pobierz_nazwe_pliku (char *nazwa, char *skad)
 {
 	int i = 0, j = 0;
-	char *nazwa = malloc ( 128 * sizeof(char));
 
 	while ( skad [i]  == '!')
 		i++;
@@ -45,5 +44,6 @@ char *pobierz_nazwe_pliku (char *skad)
 	}
 	skad [i] = '!';
 
-	return nazwa;
+	return;
+
 }

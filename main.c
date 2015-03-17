@@ -3,19 +3,24 @@
 #include <string.h>
 #include "pliki.h"
 #include "flagi.h"
+#include "baza.h"
 
 int main (int argc, char *argv[])
 {
-	int n_flag=1, tryb_flag=0;
+	int n_flag = 1, tryb_flag=0;
 	char *zapisz, *generuj;
-	char *wczytaj, *baza;
+	char *wczytaj, *baza_pliki;
 	int limit_slow = 50, limit_akapitow = 1, N_gram = 2;
 	int warunki[7] = { 0, 0, 0, 0, 0, 0, 0 };
 
-	char *obecny_plik;
+	char *obecny_plik = malloc (128 * sizeof(char));
 
-	wczytaj = malloc (1024 * sizeof(char)); wczytaj[0] = '!';
-	baza = malloc (1024 * sizeof(char)); baza[0] = '!';
+	baza_t baza;
+
+	wczytaj = malloc (1024 * sizeof(char));
+	wczytaj[0] = '!';
+	baza_pliki = malloc (1024 * sizeof(char)); 
+	baza_pliki[0] = '!';
 
 	if (argc < 3)
 		{
@@ -122,7 +127,7 @@ int main (int argc, char *argv[])
 			}
 			else if (tryb_flag == 7)
 			{
-				dodaj_plik (baza, argv[n_flag]);
+				dodaj_plik (baza_pliki, argv[n_flag]);
 				warunki[6]++;
 
 				if ( n_flag + 1 < argc )
@@ -148,26 +153,39 @@ int main (int argc, char *argv[])
 		return 1;
 	}
 
-//////////////      GENEROWANIE BAZY      ////////////////
+//////////////      INICJOWANIE BAZY      ////////////////
 	
+	stworz_baze (&baza, N_gram);
+	if (baza.N == 0)
+	{
+		fprintf (stderr,"Baza nie została zainicjowana");
+		return 1;
+	}
+
+//////////////      GENEROWANIE BAZY      ////////////////
+
 	while ( warunki[0] != 0 )
 	{
-		obecny_plik = pobierz_nazwe_pliku (wczytaj);
-
-		//BAZA
-		warunki[0]--;
+		pobierz_nazwe_pliku (obecny_plik, wczytaj);
+	
+		if (obecny_plik != NULL)
+		{
+			dodaj_do_bazy (&baza, obecny_plik);
+			warunki[0]--;
+		}
 	}
 
-	while (warunki[6] != 0 )
+/*	while (warunki[6] != 0 )
 	{
-		obecny_plik = pobierz_nazwe_pliku (baza);
-		
-		//BAZA
+		obecny_plik = pobierz_nazwe_pliku (baza_pliki);
+		dodaj_do_bazy (&baza, obecny_plik);
 		warunki[6]--;
 	}
+*/
 
-
+	zwolnij_baze(&baza);
 	free(wczytaj);
-	free(baza);
+	free(obecny_plik);
+	free(baza_pliki);
 	return 0;
 }
