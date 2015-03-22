@@ -4,6 +4,7 @@
 #include "pliki.h"
 #include "flagi.h"
 #include "baza.h"
+#include "gen.h"
 
 int main (int argc, char *argv[])
 {
@@ -175,13 +176,40 @@ int main (int argc, char *argv[])
 		}
 	}
 
-/*	while (warunki[6] != 0 )
+	//TO SAMO DLA warunki[6]!!!
+
+//////////////      GENEROWANIE TEKSTU      //////////////
+
+	int l_slow = N_gram - 1;
+	int l_akapitow = 1;
+	
+	FILE *druk = NULL;
+	if ( warunki[4] == 1 )
+		druk = fopen (zapisz, "w");
+	else
+		druk = stdout;
+
+	/*
+	fprintf (druk, "%s ", baza.komorka[0].slowo);
+
+	while (WARUNKI (BLISKO) KOŃCA)
 	{
-		obecny_plik = pobierz_nazwe_pliku (baza_pliki);
-		dodaj_do_bazy (&baza, obecny_plik);
-		warunki[6]--;
+		Znajdź kolejne słowo
+		Wydrukuj je
 	}
-*/
+
+	Dodrukuj ostatnie słowa
+
+	*/
+
+	/*
+	Wybierz słowo początkowe
+	Dokładaj losowo słowa
+	Jeżeli natrafisz na słowo końcowe to zacznij od początkowego
+	Jeżeli musisz kończyć to urwij
+	*/
+
+//////////////      ZWALNIANIE DANYCH      //////////////
 
 	zwolnij_baze(&baza);
 	free(wczytaj);

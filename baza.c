@@ -38,7 +38,7 @@ void stworz_baze ( baza_t *nowa, int N)
 
 void dodaj_do_bazy ( baza_t *baza, char *plik)
 {
-/*	char *sufiks, *prefiks;
+	char *sufiks, *prefiks;
 	FILE *odczyt = fopen (plik, "r");
 
 	if (odczyt == NULL)
@@ -47,10 +47,12 @@ void dodaj_do_bazy ( baza_t *baza, char *plik)
 		return;
 	}
 
-	while ( prefiks != EOF
 	
+
+//	while ( prefiks != EOF
+
 	fclose (odczyt);
-*/	return;
+	return;
 }
 
 void zwolnij_baze ( baza_t *baza)
