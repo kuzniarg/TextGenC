@@ -168,17 +168,30 @@ int main (int argc, char *argv[])
 	while ( warunki[0] != 0 )
 	{
 		pobierz_nazwe_pliku (obecny_plik, wczytaj);
-	
+
 		if (obecny_plik != NULL)
 		{
 			dodaj_do_bazy (&baza, obecny_plik);
 			warunki[0]--;
 		}
+		porzadkuj_baze (&baza);
 	}
 
-	//TO SAMO DLA warunki[6]!!!
+	while ( warunki[6] != 0 )
+	{
+		pobierz_nazwe_pliku (obecny_plik, wczytaj);
 
-//////////////      GENEROWANIE TEKSTU      //////////////
+		if (obecny_plik != NULL)
+		{
+			dolacz_do_bazy (&baza, obecny_plik);
+			warunki[6]--;
+		}
+		porzadkuj_baze (&baza);
+	}
+	
+//////////////      ZAPIS BAZY DO PLIKU      //////////////
+
+//////////////      GENEROWANIE I WYDRUK TEKSTU      //////////////
 
 	int l_slow = N_gram - 1;
 	int l_akapitow = 1;
@@ -189,18 +202,19 @@ int main (int argc, char *argv[])
 	else
 		druk = stdout;
 
-	/*
-	fprintf (druk, "%s ", baza.komorka[0].slowo);
 
-	while (WARUNKI (BLISKO) KOŃCA)
+	fprintf (druk, "%s ", baza.komorka[0].prefiks);
+
+	while (l_slow < limit_slow)
 	{
-		Znajdź kolejne słowo
-		Wydrukuj je
+		//Znajdź kolejne słowo
+		//Wydrukuj je
+		fprintf (druk, "%s ", baza.komorka[l_slow].sufiks);
+		l_slow++;
 	}
 
-	Dodrukuj ostatnie słowa
+	fprintf (druk, ".");
 
-	*/
 
 	/*
 	Wybierz słowo początkowe
@@ -211,9 +225,9 @@ int main (int argc, char *argv[])
 
 //////////////      ZWALNIANIE DANYCH      //////////////
 
-	zwolnij_baze(&baza);
-	free(wczytaj);
-	free(obecny_plik);
-	free(baza_pliki);
+	//zwolnij_baze(&baza);
+	//free(wczytaj);
+	//free(obecny_plik);
+	//free(baza_pliki);
 	return 0;
 }

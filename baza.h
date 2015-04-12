@@ -3,8 +3,8 @@
 
 typedef struct komorka_pom
 {
-	char *slowo;
-	char *nast;
+	char *prefiks;
+	char *sufiks;
 	int ile_razy;
 
 } komorka_t;
@@ -19,6 +19,8 @@ typedef struct bazunia
 
 void stworz_baze (baza_t *baza, int N);
 void dodaj_do_bazy (baza_t *baza, char *plik);
+void dolacz_do_bazy (baza_t *baza, char *plik);
 void zwolnij_baze (baza_t *baza);
 void powieksz_baze (baza_t *baza);
+void porzadkuj_baze (baza_t *baza);
 #endif
