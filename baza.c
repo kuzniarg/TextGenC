@@ -17,6 +17,7 @@ void stworz_baze ( baza_t *nowa, int N)
 	nowa->aktualnie = 0;
 	nowa->rozmiar = 8;
 	nowa->N = N;
+	nowa->pom_los = 0;
 	
 	nowa->komorka = malloc (nowa->rozmiar * sizeof( komorka_t ));
 	if (nowa->komorka == NULL)
@@ -29,7 +30,7 @@ void stworz_baze ( baza_t *nowa, int N)
 	for (i=0; i < nowa->rozmiar; i++)
 	{
 		nowa->komorka[i].prefiks = (char*) malloc (128 * sizeof(char));
-		nowa->komorka[i].sufiks = (char*) malloc (64 * sizeof(char));
+		nowa->komorka[i].sufiks = (char*) malloc (128 * sizeof(char));
 
 		if (nowa->komorka[i].prefiks == NULL || nowa->komorka[i].sufiks == NULL)
 		{
@@ -38,7 +39,7 @@ void stworz_baze ( baza_t *nowa, int N)
 			return;
 		}	
 	nowa->komorka[i].prefiks[0] = '$';
-	nowa->komorka[i].sufiks[0] = '$';	
+	nowa->komorka[i].sufiks[0] = '$';
 	}	
 	
 	return;
@@ -256,10 +257,18 @@ void oczysc_komorke (komorka_t a, int N)
 		a.prefiks[1] = '\0';
 		a.ile_razy = 0;
 	}
+	else if ( strcmp(a.sufiks, "$") == 0)
+	{
+		a.sufiks[0] = '$';
+		a.sufiks[1] = '\0';
+		a.prefiks[0] = '$';
+		a.prefiks[1] = '\0';
+		a.ile_razy = 0;
+	}
 	else
 	{
 		for (i = 0; a.prefiks[i] != '$'; i++);
-		a.prefiks[i] = '\0';
+		a.prefiks[i+1] = '\0';
 	}
 	return;
 }
@@ -267,5 +276,63 @@ void oczysc_komorke (komorka_t a, int N)
 
 void dolacz_do_bazy ( baza_t *baza, char *plik)
 {
+	char znak, slowo[32];
+	FILE *odczyt = fopen (plik, "r");
+	int N = baza->N, i = 0, j = baza->aktualnie, k, nr_slowa = 0, pom1 = 1, czy_pierwsze = 0, koniec = 0;
+	wyczysc_slowo (slowo);
+	if (odczyt == NULL)
+	{
+		fprintf (stderr, "Nie udało się otworzyć pliku \"%s\"\n", plik);
+		return;
+	}
+	
+
+	znak = fgetc (odczyt);
+	while (znak != EOF || koniec == 1)
+	{
+		if ( znak != ' ' && znak != EOF )
+		{
+			slowo[i++] = znak;
+		}
+		else
+		{
+			baza->aktualnie++;
+			if (baza->aktualnie > baza->rozmiar)
+				powieksz_baze(baza);
+			
+			i = 0;
+			baza->komorka[nr_slowa].ile_razy = 1;
+			nr_slowa++;
+			
+			if ( nr_slowa % N != 0 && czy_pierwsze == 0 )
+			{
+				while (pom1 <= nr_slowa)
+				{	
+					dodaj_slowo ( baza->komorka[j + pom1 - 1].prefiks, slowo );
+					pom1++;
+				}
+				pom1=1;
+			}
+			else 
+			{
+				czy_pierwsze = 1;
+
+				for ( k = 1; k < N; k++)
+					dodaj_slowo ( baza->komorka[j+k].prefiks, slowo);
+				
+				dodaj_slowo (baza->komorka[j].sufiks, slowo);
+				j++;
+			}
+			wyczysc_slowo (slowo);
+		}
+		if (koniec == 0)
+			znak = fgetc (odczyt);
+		if (znak == EOF) 
+			koniec++;
+		if (koniec > 1)
+			break;
+	}
+	
+	fclose (odczyt);
 	return;
 }

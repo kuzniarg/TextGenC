@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "pliki.h"
 #include "flagi.h"
 #include "baza.h"
@@ -9,14 +10,15 @@
 int main (int argc, char *argv[])
 {
 	int n_flag = 1, tryb_flag=0;
-	char *zapisz, *generuj;
-	char *wczytaj, *baza_pliki;
+	char *zapisz, *generuj, *wczytaj, *baza_pliki;
 	int limit_slow = 50, limit_akapitow = 1, N_gram = 2;
 	int warunki[7] = { 0, 0, 0, 0, 0, 0, 0 };
 
 	char *obecny_plik = malloc (128 * sizeof(char));
 
 	baza_t baza;
+	
+	srand (time(NULL));
 
 	wczytaj = malloc (1024 * sizeof(char));
 	wczytaj[0] = '!';
@@ -195,6 +197,8 @@ int main (int argc, char *argv[])
 
 	int l_slow = N_gram - 1;
 	int l_akapitow = 1;
+	int i = 0;
+	char *slowo = malloc (128 * sizeof(char));
 	
 	FILE *druk = NULL;
 	if ( warunki[4] == 1 )
@@ -202,26 +206,25 @@ int main (int argc, char *argv[])
 	else
 		druk = stdout;
 
-
-	fprintf (druk, "%s ", baza.komorka[0].prefiks);
+	strcpy(slowo, baza.komorka[0].prefiks);
+	while ( slowo[i] != '$' )
+		i++;
+	slowo[i] = '\0';
+	
+	fprintf (druk, "%s", slowo);
+	
+	slowo[i] = '$';
 
 	while (l_slow < limit_slow)
 	{
-		//Znajdź kolejne słowo
-		//Wydrukuj je
-		fprintf (druk, "%s ", baza.komorka[l_slow].sufiks);
+		if ( jest_slowo(baza, slowo) == 1 )
+			fprintf (druk, " %s", podaj_slowo(baza, slowo));
+		else
+			fprintf (druk, " %s", nowy_poczatek(baza, slowo));
 		l_slow++;
 	}
 
 	fprintf (druk, ".");
-
-
-	/*
-	Wybierz słowo początkowe
-	Dokładaj losowo słowa
-	Jeżeli natrafisz na słowo końcowe to zacznij od początkowego
-	Jeżeli musisz kończyć to urwij
-	*/
 
 //////////////      ZWALNIANIE DANYCH      //////////////
 
