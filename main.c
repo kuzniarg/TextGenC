@@ -196,7 +196,6 @@ int main (int argc, char *argv[])
 //////////////      GENEROWANIE I WYDRUK TEKSTU      //////////////
 
 	int l_slow = N_gram - 1;
-	int l_akapitow = 1;
 	int i = 0;
 	char *slowo = malloc (128 * sizeof(char));
 	
@@ -211,7 +210,7 @@ int main (int argc, char *argv[])
 		i++;
 	slowo[i] = '\0';
 	
-	fprintf (druk, "%s", slowo);
+	fprintf (druk, "\t%s", slowo);
 	
 	slowo[i] = '$';
 
@@ -220,11 +219,45 @@ int main (int argc, char *argv[])
 		if ( jest_slowo(baza, slowo) == 1 )
 			fprintf (druk, " %s", podaj_slowo(baza, slowo));
 		else
-			fprintf (druk, " %s", nowy_poczatek(baza, slowo));
+		{
+			i = 0;
+			while (slowo[i] != '$' )
+			{
+				if (slowo[i] == '.')
+				{
+					i=-1;
+					break;
+				}
+				i++;
+			}
+			
+			if ( i != -1 )
+				fprintf (druk, ".");
+				
+			if (limit_akapitow > 1)
+			{
+				fprintf (druk, "\n\t");
+				limit_akapitow--;
+			}
+			else fprintf (druk, " ");
+			fprintf (druk, "%s", nowy_poczatek(baza, slowo));		
+		}	
 		l_slow++;
 	}
 
-	fprintf (druk, ".");
+	i = 0;
+	while (slowo[i] != '$' )
+	{
+		if (slowo[i] == '.')
+		{
+			i=-1;
+			break;
+		}
+		i++;
+	}
+	
+	if ( i != -1 )
+		fprintf (druk, ".");
 
 //////////////      ZWALNIANIE DANYCH      //////////////
 

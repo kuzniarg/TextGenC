@@ -64,7 +64,9 @@ void dodaj_do_bazy ( baza_t *baza, char *plik)
 	{
 		if ( znak != ' ' && znak != EOF )
 		{
-			slowo[i++] = znak;
+			if (isalnum(znak) || znak == '.' || znak == ',' || znak == '!' || znak == '?' 
+							  || znak == ':' || znak == '-' || znak == '(' || znak == ')')
+				slowo[i++] = znak;
 		}
 		else
 		{
