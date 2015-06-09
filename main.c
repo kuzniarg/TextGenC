@@ -148,7 +148,7 @@ int main (int argc, char *argv[])
 		n_flag++;
 	}
 
-//////////////      SPRAWDZENIE OBECNOŚCI NIEZBĘDNYCH DANYCH      ////////////////
+//////////////      SPRAWDZENIE OBECNOŚCI NIEZBĘDNYCH DANYCH 1     ////////////////
 	
 	if ( (warunki[0] == 0) && (warunki[6] == 0))
 	{
@@ -161,7 +161,7 @@ int main (int argc, char *argv[])
 	stworz_baze (&baza, N_gram);
 	if (baza.N == 0)
 	{
-		fprintf (stderr,"Baza nie została zainicjowana");
+		fprintf (stderr,"Baza nie została zainicjowana\n");
 		return 1;
 	}
 
@@ -190,6 +190,14 @@ int main (int argc, char *argv[])
 		}
 		porzadkuj_baze (&baza);
 	}
+
+//////////////      SPRAWDZENIE OBECNOŚCI NIEZBĘDNYCH DANYCH 2    ////////////////
+
+	if ( baza.aktualnie < 10 )
+	{
+		fprintf (stderr,"Baza ma mniej niż 10 pól - nie ma sensu generować tekstu\n");
+		return 1;
+	}
 	
 //////////////      ZAPIS BAZY DO PLIKU      //////////////
 
@@ -207,8 +215,7 @@ int main (int argc, char *argv[])
 		int gen_pom_suf = 0;
 		while ( gen_pom < baza.aktualnie )
 		{
-			fprintf( zapis, "%s#%s#%d;", baza.komorka[gen_pom].prefiks,
-				     baza.komorka[gen_pom].sufiks, baza.komorka[gen_pom].ile_razy);
+			fprintf( zapis, "%s#%s;", baza.komorka[gen_pom].prefiks, baza.komorka[gen_pom].sufiks);
 			gen_pom++;
 		}
 	}
@@ -276,13 +283,13 @@ int main (int argc, char *argv[])
 	}
 	
 	if ( c == ' ' )
-		fprintf (druk, ".");
+		fprintf (druk, ".\n");
 
 //////////////      ZWALNIANIE DANYCH      //////////////
 
-	//zwolnij_baze(&baza);
-	//free(wczytaj);
-	//free(obecny_plik);
-	//free(baza_pliki);
+	zwolnij_baze(&baza);
+	free(wczytaj);
+	free(obecny_plik);
+	free(baza_pliki);
 	return 0;
 }

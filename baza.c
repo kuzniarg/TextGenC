@@ -5,7 +5,7 @@
 
 void dodaj_slowo (char *gdzie, char jakie[]);
 void dodaj_sufiks ( char *gdzie, char *jakie );
-void wyczysc_slowo (char *slowo);
+void wyczysc_slowo (char *slowo, int dl);
 void polacz_komorki(komorka_t a, komorka_t b);
 void zastap_komorke(komorka_t a, komorka_t b);
 int oczysc_komorke(komorka_t a, int N);
@@ -16,7 +16,7 @@ void stworz_baze ( baza_t *nowa, int N)
 	int i;
 	
 	nowa->aktualnie = 0;
-	nowa->rozmiar = 8;
+	nowa->rozmiar = 16;
 	nowa->N = N;
 	
 	nowa->komorka = malloc (nowa->rozmiar * sizeof( komorka_t ));
@@ -51,7 +51,7 @@ void dodaj_do_bazy ( baza_t *baza, char *plik)
 	char znak, slowo[32];
 	FILE *odczyt = fopen (plik, "r");
 	int N = baza->N, i = 0, j = baza->aktualnie, k, nr_slowa = 0, pom1 = 1, czy_pierwsze = 0, koniec = 0;
-	wyczysc_slowo (slowo);
+	wyczysc_slowo (slowo, 32);
 	if (odczyt == NULL)
 	{
 		fprintf (stderr, "Nie udało się otworzyć pliku \"%s\"\n", plik);
@@ -99,7 +99,7 @@ void dodaj_do_bazy ( baza_t *baza, char *plik)
 				dodaj_slowo (baza->komorka[j].sufiks, slowo);
 				j++;
 			}
-			wyczysc_slowo (slowo);
+			wyczysc_slowo (slowo, 32);
 		}
 		if (koniec == 0)
 			znak = fgetc (odczyt);
@@ -143,7 +143,7 @@ void powieksz_baze ( baza_t *baza )
 		}	
 		baza->komorka[i].prefiks[0] = '$';
 		baza->komorka[i].sufiks[0] = '$';	
-	}	
+	}
 }
 
 void dodaj_slowo ( char *gdzie, char jakie[] )
@@ -170,10 +170,10 @@ void dodaj_slowo ( char *gdzie, char jakie[] )
 	return;
 }
 
-void wyczysc_slowo (char* slowo)
+void wyczysc_slowo (char *slowo, int dl)
 {
 	int i;
-	for (i=0; i<32; i++)
+	for (i=0; i<dl; i++)
 		slowo[i] = '\0';
 	return;
 }
@@ -341,63 +341,81 @@ int oczysc_komorke (komorka_t a, int N)
 
 void dolacz_do_bazy ( baza_t *baza, char *plik)
 {
-	char znak, slowo[32];
+	char znak, poprz, prefiks[128], sufiks[128];
 	FILE *odczyt = fopen (plik, "r");
-	int N = baza->N, i = 0, j = baza->aktualnie, k, nr_slowa = 0, pom1 = 1, czy_pierwsze = 0, koniec = 0;
-	wyczysc_slowo (slowo);
+	int N = baza->N, i = 0, k, nr_slowa = 0, pom1 = 1, przelacznik = 0, koniec = 0;
+	wyczysc_slowo (prefiks, 128);
+	wyczysc_slowo (sufiks, 128);
+
 	if (odczyt == NULL)
 	{
 		fprintf (stderr, "Nie udało się otworzyć pliku \"%s\"\n", plik);
 		return;
 	}
+
+	znak = fgetc (odczyt);
+	if ( znak == EOF || !isdigit(znak) || baza->N != znak-48 )
+	{
+		fprintf (stderr, "Baza w pliku \"%s\" ma zły format\n", plik);
+		return;
+	}
 	
+	znak = fgetc (odczyt);
+	if (znak != ';')
+	{
+		fprintf (stderr, "Baza w pliku \"%s\" ma zły format\n", plik);
+		return;
+	}
+
 
 	znak = fgetc (odczyt);
 	while (znak != EOF || koniec == 1)
-	{
-		if ( znak != ' ' && znak != EOF )
+	{	
+		if ( znak != ';' && znak != EOF )
 		{
-			slowo[i++] = znak;
+			if ( znak == '#' )
+			{
+				przelacznik = 1;
+				i=0;
+			}
+			else if (przelacznik == 0)
+				prefiks[i++] = znak;
+			else sufiks[i++] = znak;
 		}
 		else
 		{
-			baza->aktualnie++;
-			if (baza->aktualnie > baza->rozmiar)
-				powieksz_baze(baza);
-			
-			i = 0;
-			baza->komorka[nr_slowa].ile_razy = 1;
-			nr_slowa++;
-			
-			if ( nr_slowa % N != 0 && czy_pierwsze == 0 )
+			if ( isalnum(prefiks[0]) && isalnum(sufiks[0]) )
 			{
-				while (pom1 <= nr_slowa)
-				{	
-					dodaj_slowo ( baza->komorka[j + pom1 - 1].prefiks, slowo );
-					pom1++;
-				}
-				pom1=1;
-			}
-			else 
-			{
-				czy_pierwsze = 1;
-
-				for ( k = 1; k < N; k++)
-					dodaj_slowo ( baza->komorka[j+k].prefiks, slowo);
+				baza->aktualnie++;
+				if (baza->aktualnie >= baza->rozmiar)
+					powieksz_baze(baza);
 				
-				dodaj_slowo (baza->komorka[j].sufiks, slowo);
-				j++;
+				strcpy( baza->komorka[baza->aktualnie].prefiks, prefiks);
+				strcpy( baza->komorka[baza->aktualnie].sufiks, sufiks);
 			}
-			wyczysc_slowo (slowo);
+			wyczysc_slowo (prefiks, 128);
+			wyczysc_slowo (sufiks, 128);
+			przelacznik = 0;
+			i = 0;
 		}
+		
+		poprz = znak;
+
 		if (koniec == 0)
 			znak = fgetc (odczyt);
 		if (znak == EOF) 
 			koniec++;
 		if (koniec > 1)
 			break;
-	}
+		if ( poprz == ';' && !isalnum(znak) )
+			while (znak != ';' && znak != EOF)
+				znak = fgetc (odczyt);
+		if (znak == EOF) 
+			koniec++;
+		if (koniec > 1)
+			break;
+		}
 	
-	fclose (odczyt);
+	fclose (odczyt);powieksz_baze(baza);
 	return;
 }
