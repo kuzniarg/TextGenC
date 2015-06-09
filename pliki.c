@@ -43,6 +43,7 @@ void pobierz_nazwe_pliku (char *nazwa, char *skad)
 		skad[i++] = '!';
 	}
 	skad [i] = '!';
+	nazwa[j] = '\0';
 
 	return;
 

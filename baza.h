@@ -15,7 +15,6 @@ typedef struct bazunia
 	int N;
 	int aktualnie;
 	int rozmiar;
-	int pom_los;
 } baza_t;
 
 void stworz_baze (baza_t *baza, int N);

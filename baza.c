@@ -5,10 +5,11 @@
 
 void dodaj_slowo (char *gdzie, char jakie[]);
 void dodaj_sufiks ( char *gdzie, char *jakie );
-void wyczysc_slowo (char* slowo);
+void wyczysc_slowo (char *slowo);
 void polacz_komorki(komorka_t a, komorka_t b);
 void zastap_komorke(komorka_t a, komorka_t b);
-void oczysc_komorke(komorka_t a, int N);
+int oczysc_komorke(komorka_t a, int N);
+int czy_zawiera (char *co, char *wyraz);
 
 void stworz_baze ( baza_t *nowa, int N)
 {	
@@ -17,7 +18,6 @@ void stworz_baze ( baza_t *nowa, int N)
 	nowa->aktualnie = 0;
 	nowa->rozmiar = 8;
 	nowa->N = N;
-	nowa->pom_los = 0;
 	
 	nowa->komorka = malloc (nowa->rozmiar * sizeof( komorka_t ));
 	if (nowa->komorka == NULL)
@@ -62,6 +62,8 @@ void dodaj_do_bazy ( baza_t *baza, char *plik)
 	znak = fgetc (odczyt);
 	while (znak != EOF || koniec == 1)
 	{
+		if ( znak == '\t' )
+			znak = ' ';
 		if ( znak != ' ' && znak != EOF )
 		{
 			if (isalnum(znak) || znak == '.' || znak == ',' || znak == '!' || znak == '?' 
@@ -187,29 +189,80 @@ void porzadkuj_baze (baza_t *baza)
 				polacz_komorki(baza->komorka[i], baza->komorka[j]);
 	
 	for (i = 0; i < baza->aktualnie; i++)
-		oczysc_komorke (baza->komorka[i], baza->N);
+		baza->komorka[i].ile_razy = oczysc_komorke (baza->komorka[i], baza->N);	
 
 	for (i = 0; i < baza->aktualnie; i++)
 		if ( baza->komorka[i].prefiks[0] == '$')
-			zastap_komorke(baza->komorka[i], baza->komorka[--baza->aktualnie]);
-
+		{
+			baza->aktualnie--;
+			j = baza->aktualnie;
+			strcpy ( baza->komorka[i].prefiks, baza->komorka[j].prefiks );
+			strcpy ( baza->komorka[i].sufiks, baza->komorka[j].sufiks );
+			baza->komorka[i].ile_razy = baza->komorka[j].ile_razy;
+		}
+		
 	return;
 }
 
 
 void polacz_komorki(komorka_t a, komorka_t b)
 {
-	if ( strcmp (a.sufiks, b.sufiks) != 0)
+	if ( czy_zawiera (a.sufiks, b.sufiks) != 0 )
 	{
 		dodaj_sufiks (a.sufiks, b.sufiks);
 		b.sufiks[0] = '$';
 		b.sufiks[1] = '\0';
 		b.prefiks[0] = '$';
 		b.prefiks[1] = '\0';
-		a.ile_razy+= b.ile_razy;
-		b.ile_razy = 0;
 	}
 	return;
+}
+
+
+int czy_zawiera (char *co_org, char *wyraz_org)
+{
+	if ( co_org[0] == '$' || wyraz_org[0] == '$' )
+		return 0;
+		
+	char *spacja, co[128], wyraz[128], *pom;
+	int licznik = -1, i;
+	strcpy(co, co_org);
+	strcpy(wyraz, wyraz_org);
+	
+	if ( strcmp(co, wyraz) == 0 )
+		return 0;
+	
+	spacja = strchr(co, ' ');
+	while ( spacja != NULL )
+	{
+		licznik = spacja - co;
+		
+		pom = malloc ( 128 * sizeof(char));
+		
+		for (i = 0; i < licznik; i ++)
+		{	
+			pom[i] = co[i];
+			co[i] = '$';
+		}
+		pom[i++] = '$';
+		pom[i] = '\0';
+		
+		if ( strcmp(pom, wyraz) == 0 )
+			return 0;
+		
+		licznik = 0;
+		i = 0;
+		while ( co[licznik] == '$' )
+			licznik++;
+		
+		while ( co[i] != '\0' )
+			co[i++] = co[licznik++];
+		co[i] = '\0';
+		
+		free(pom);
+		spacja = strchr(spacja+1, ' ');
+	}
+	return 1;
 }
 
 
@@ -241,17 +294,18 @@ void dodaj_sufiks ( char *gdzie, char *jakie )
 		szukaj++;
 	}
 	gdzie[szukaj] = '$';
+	gdzie[szukaj+1] = '\0';
 	return;
 }
 
 
-void oczysc_komorke (komorka_t a, int N)
+int oczysc_komorke (komorka_t a, int N)
 {
 	int wyrazy = 1, i;
 		for (i = 0; a.prefiks[i] != '$'; i++)
 			if (a.prefiks[i] == ' ')
 				wyrazy++;
-	if (wyrazy < N-1)
+	if (wyrazy != N-1)
 	{
 		a.sufiks[0] = '$';
 		a.sufiks[1] = '\0';
@@ -259,7 +313,7 @@ void oczysc_komorke (komorka_t a, int N)
 		a.prefiks[1] = '\0';
 		a.ile_razy = 0;
 	}
-	else if ( strcmp(a.sufiks, "$") == 0)
+	else if ( !isalnum(a.sufiks[0]) )
 	{
 		a.sufiks[0] = '$';
 		a.sufiks[1] = '\0';
@@ -272,7 +326,16 @@ void oczysc_komorke (komorka_t a, int N)
 		for (i = 0; a.prefiks[i] != '$'; i++);
 		a.prefiks[i+1] = '\0';
 	}
-	return;
+
+	wyrazy = 1;
+	for (i = 0; a.sufiks[i] != '$'; i++)
+		if (a.sufiks[i] == ' ')
+			wyrazy++;
+	if (i != 0)
+		a.ile_razy = wyrazy;
+	else wyrazy = 0;
+	
+	return wyrazy;
 }
 
 

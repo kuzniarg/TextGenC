@@ -49,9 +49,7 @@ char *podaj_slowo (baza_t b, char *slowo)
 		j++;
 	}
 	
-	
-	b.pom_los+= rand();
-	losuj = ((++b.pom_los) * rand())% ile_sufiksow;
+	losuj = rand()% ile_sufiksow;
 
 	j = 0;
 	while ( losuj < ile_sufiksow - 1 )

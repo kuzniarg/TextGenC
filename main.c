@@ -134,7 +134,7 @@ int main (int argc, char *argv[])
 				warunki[6]++;
 
 				if ( n_flag + 1 < argc )
-						if ( jaki_tryb_flag ( argv[n_flag+1] ) == 0)
+					if ( jaki_tryb_flag ( argv[n_flag+1] ) == 0)
 						tryb_flag = 7;
 			}
 		}	
@@ -181,7 +181,7 @@ int main (int argc, char *argv[])
 
 	while ( warunki[6] != 0 )
 	{
-		pobierz_nazwe_pliku (obecny_plik, wczytaj);
+		pobierz_nazwe_pliku (obecny_plik, baza_pliki);
 
 		if (obecny_plik != NULL)
 		{
@@ -193,10 +193,31 @@ int main (int argc, char *argv[])
 	
 //////////////      ZAPIS BAZY DO PLIKU      //////////////
 
+	FILE *zapis = NULL;
+	if ( warunki[5] == 1 )
+		zapis = fopen (generuj, "w");
+	else
+		zapis = stdout;
+	
+	if ( zapis != NULL )
+	{
+		fprintf( zapis, "%d;", baza.N );
+		
+		int gen_pom = 1;
+		int gen_pom_suf = 0;
+		while ( gen_pom < baza.aktualnie )
+		{
+			fprintf( zapis, "%s#%s#%d;", baza.komorka[gen_pom].prefiks,
+				     baza.komorka[gen_pom].sufiks, baza.komorka[gen_pom].ile_razy);
+			gen_pom++;
+		}
+	}
+
 //////////////      GENEROWANIE I WYDRUK TEKSTU      //////////////
 
 	int l_slow = N_gram - 1;
 	int i = 0;
+	char c = ' ';
 	char *slowo = malloc (128 * sizeof(char));
 	
 	FILE *druk = NULL;
@@ -205,7 +226,7 @@ int main (int argc, char *argv[])
 	else
 		druk = stdout;
 
-	strcpy(slowo, baza.komorka[0].prefiks);
+	strcpy(slowo, baza.komorka[1].prefiks);
 	while ( slowo[i] != '$' )
 		i++;
 	slowo[i] = '\0';
@@ -224,14 +245,13 @@ int main (int argc, char *argv[])
 			while (slowo[i] != '$' )
 			{
 				if (slowo[i] == '.')
-				{
-					i=-1;
-					break;
-				}
+					c = '.';
+				if (slowo[i] == ' ')
+					c = ' ';
 				i++;
 			}
 			
-			if ( i != -1 )
+			if ( c == ' ' )
 				fprintf (druk, ".");
 				
 			if (limit_akapitow > 1)
@@ -249,14 +269,13 @@ int main (int argc, char *argv[])
 	while (slowo[i] != '$' )
 	{
 		if (slowo[i] == '.')
-		{
-			i=-1;
-			break;
-		}
+			c = '.';
+		if (slowo[i] == ' ')
+			c = ' ';
 		i++;
 	}
 	
-	if ( i != -1 )
+	if ( c == ' ' )
 		fprintf (druk, ".");
 
 //////////////      ZWALNIANIE DANYCH      //////////////
