@@ -4,7 +4,7 @@ Instrukcja używania programu TextGenC:
 	-r "nazwa_pliku" odczyt tekstu z pliku, możliwość podania wielu
 	-w "liczba_naturalna" maksymalna długość tekstu (domyślnie 50)
 	-p "liczba_naturalna" maksymalna ilość akapitów (domyślnie 1)
-	-n "liczba_naturalna" długość N-gramu (domyślnie 2)
+	-n "liczba_naturalna" długość N-gramu (domyślnie 3)
 	-s "nazwa_pliku" zapis wygenerowanego tekstu do pliku (domyślnie wydruk na ekran)
 	-g "nazwa_pliku" zapis bazy generowanej przez program do pliku
 	-b "nazwa_pliku" odczyt pliku z bazą wygenerowaną wcześniej przez program

@@ -11,7 +11,7 @@ int main (int argc, char *argv[])
 {
 	int n_flag = 1, tryb_flag=0;
 	char *zapisz, *generuj, *wczytaj, *baza_pliki;
-	int limit_slow = 50, limit_akapitow = 1, N_gram = 2;
+	int limit_slow = 50, limit_akapitow = 1, N_gram = 3;
 	int warunki[7] = { 0, 0, 0, 0, 0, 0, 0 };
 
 	char *obecny_plik = malloc (128 * sizeof(char));
@@ -102,7 +102,8 @@ int main (int argc, char *argv[])
 			}
 			else if (tryb_flag == 4)
 			{
-				N_gram = atoi (argv[n_flag]);
+				if ( N_gram <= atoi (argv[n_flag]) )
+					N_gram = atoi (argv[n_flag]);
 				if (N_gram > 0)
 				{
 					tryb_flag = 0;	
@@ -205,7 +206,7 @@ int main (int argc, char *argv[])
 	if ( warunki[5] == 1 )
 		zapis = fopen (generuj, "w");
 	else
-		zapis = stdout;
+		zapis = NULL;
 	
 	if ( zapis != NULL )
 	{
@@ -232,7 +233,9 @@ int main (int argc, char *argv[])
 		druk = fopen (zapisz, "w");
 	else
 		druk = stdout;
-
+	
+	fprintf (druk, "\n-----------------------------------------------\n");
+	
 	strcpy(slowo, baza.komorka[1].prefiks);
 	while ( slowo[i] != '$' )
 		i++;
@@ -283,7 +286,9 @@ int main (int argc, char *argv[])
 	}
 	
 	if ( c == ' ' )
-		fprintf (druk, ".\n");
+		fprintf (druk, ".");
+	
+	fprintf (druk, "\n-----------------------------------------------\n");
 
 //////////////      ZWALNIANIE DANYCH      //////////////
 

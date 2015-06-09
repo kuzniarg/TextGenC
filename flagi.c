@@ -65,7 +65,7 @@ void blad_brak_argumentow ()
 	"      -r \"nazwa_pliku\" odczyt tekstu z pliku, możliwość podania wielu\n"
 	"      -w \"liczba_naturalna\" maksymalna długość tekstu (domyślnie 50)\n"
 	"      -p \"liczba_naturalna\" maksymalna ilość akapitów (domyślnie 1)\n"
-	"      -n \"liczba_naturalna\" długość N-gramu (domyślnie 2)\n"
+	"      -n \"liczba_naturalna\" długość N-gramu (domyślnie 3)\n"
 	"      -s \"nazwa_pliku\" zapis wygenerowanego tekstu do pliku (domyślnie wydruk na ekran)\n"
 	"      -g \"nazwa_pliku\" zapis bazy generowanej przez program do pliku\n"
 	"      -b \"nazwa_pliku\" odczyt pliku z bazą wygenerowaną wcześniej przez program\n"
