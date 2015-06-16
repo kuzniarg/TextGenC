@@ -78,6 +78,7 @@ void dodaj_do_bazy ( baza_t *baza, char *plik)
 			
 			i = 0;
 			baza->komorka[nr_slowa].ile_razy = 1;
+			baza->komorka[nr_slowa].stat = 0;
 			nr_slowa++;
 			
 			if ( nr_slowa % N != 0 && czy_pierwsze == 0 )

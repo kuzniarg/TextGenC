@@ -6,6 +6,7 @@
 #include "flagi.h"
 #include "baza.h"
 #include "gen.h"
+#include "stat.h"
 
 int main (int argc, char *argv[])
 {
@@ -70,9 +71,9 @@ int main (int argc, char *argv[])
 			
 			else if (tryb_flag == 2)
 			{
-					limit_slow = atoi (argv[n_flag]);
-					if (limit_slow > 0) 
+					if (limit_slow < atoi (argv[n_flag]))
 					{
+						limit_slow = atoi (argv[n_flag]);
 						tryb_flag = 0;
 						warunki[1] = 1;
 					}
@@ -102,15 +103,16 @@ int main (int argc, char *argv[])
 			}
 			else if (tryb_flag == 4)
 			{
-				if ( N_gram <= atoi (argv[n_flag]) )
+				if ( N_gram <= atoi (argv[n_flag])) 
 					N_gram = atoi (argv[n_flag]);
-				if (N_gram > 0)
+				if (isdigit(argv[n_flag][0]) > 0)
 				{
 					tryb_flag = 0;	
 					warunki[3] = 1;
 				}
 				else
 				{
+					N_gram = 3;
 					fprintf (stderr, "Flaga -n otrzymała złą wartość. Argument %s zostanie zignorowany\n", argv[n_flag]);
 					if ( n_flag + 1 < argc )
 						if ( jaki_tryb_flag ( argv[n_flag+1] ) == 0)
@@ -242,6 +244,7 @@ int main (int argc, char *argv[])
 	slowo[i] = '\0';
 	
 	fprintf (druk, "\t%s", slowo);
+	baza.komorka[1].stat++;
 	
 	slowo[i] = '$';
 
@@ -289,6 +292,10 @@ int main (int argc, char *argv[])
 		fprintf (druk, ".");
 	
 	fprintf (druk, "\n-----------------------------------------------\n");
+
+//////////////      WYRDUK STATYSTYKI      //////////////
+
+najNGram (baza);
 
 //////////////      ZWALNIANIE DANYCH      //////////////
 

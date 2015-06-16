@@ -70,6 +70,8 @@ char *podaj_slowo (baza_t b, char *slowo)
 	slowo[k] = '\0';
 	wydruk[l] = '\0';
 	
+	b.komorka[i].stat++;
+	
 	return wydruk;
 }
 
@@ -94,6 +96,9 @@ char *nowy_poczatek (baza_t b, char *slowo)
 		wydruk[i] = slowo[i];
 		i++;
 	}
+	
+	b.komorka[i].stat++;
+	
 	wydruk[++i] = '\0';
 	return wydruk;
 }

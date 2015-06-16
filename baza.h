@@ -6,6 +6,7 @@ typedef struct komorka_pom
 	char *prefiks;
 	char *sufiks;
 	int ile_razy;
+	int stat;
 
 } komorka_t;
 
