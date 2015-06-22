@@ -22,6 +22,16 @@ void najNGram (baza_t b)
 		}
 		i++;
 	}
+	i=0;
+	while(b.komorka[najI].prefiks[i] != '$')
+		i++;
+	b.komorka[najI].prefiks[i] = '\0';
+
+	i=0;
+	while(b.komorka[najII].prefiks[i] != '$')
+		i++;
+	b.komorka[najII].prefiks[i] = '\0';
+
 	printf("Najwięcej sufiksów ma prefiks:\n");
 	printf("%s - %d\n", b.komorka[najI].prefiks, najV);
 	printf("Najczęściej występujący prefiks:\n");
